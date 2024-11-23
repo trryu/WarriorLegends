@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html style="height: 100%; width: 100%;">
+<head>
+    <script type="text/javascript">
+        var x = 0;
+        var x_inc = 0;
+        var y = 0;
+        var y_inc = 0;
+        var hero = null;
+        var map = null;
+        function startmap() {
+            map = document.getElementById("map");
+            x_inc = map.getBoundingClientRect().width / 11;
+            y_inc = map.getBoundingClientRect().height / 11;
+            hero = document.getElementById("hero");
+            hero.style.width = x_inc;
+            hero.style.height = y_inc;
+            hero.style.top = (x_inc * x) + "px";
+            hero.style.left = (y_inc * y) + "px";
+        }
+        document.addEventListener('keydown', (event) => {
+            switch(event.key) {
+                case 'ArrowUp':
+                    if (y > 0) {
+                        y = y - 1;
+                        hero.style.top = (y * y_inc) + "px";
+                    }
+                    break;
+                case 'ArrowDown':
+                    if (y < 10) {
+                        y = y + 1;
+                        hero.style.top = (y * y_inc) + "px";
+                    }
+                    break;
+                case 'ArrowLeft':
+                    if (x > 0) {
+                        x = x - 1;
+                        hero.style.left = (x * x_inc) + "px";
+                    }
+                    break;
+                case 'ArrowRight':
+                    if (x < 10) {
+                        x = x + 1;
+                        hero.style.left = (x * x_inc) + "px";
+                    }
+                    break;
+            }
+        });
+    </script>
+	<title>Warrior Legends</title>
+</head>
+<body style="width: 98%; height: 98%; background-color: black; color: white; margin: 1%;">
+	<div style="height: 100%; width: 100%; background-color: gray; border-radius: 5px; display: flex; flex-direction: column;">
+        <div style="flex: 0 1 35%; padding: 5px;">
+            <div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
+                <div style="flex: 1 1 50%;">
+                    <div style="text-align: center; font-size: 48px; color: gold;">Warrior Legends</div>
+                </div>
+                <div style="flex: 1 1 100%;">
+                    <div style="display: flex; position: relative;">
+                        <div style="width: 30%;">
+                            <img src="./pictures/warrior_profile.jpg" style="border: 3px solid gold; position: absolute; top: 0; left: 0; width: 30%;" />
+                        </div>
+                        <div style="position: absolute; top: 0; left: 30%; width: 70%;">
+                            <div style="display: flex; flex-direction: column; margin: 1px; border: 3px solid gold; border-radius: 5px; background-color: blue; padding: 5px;">
+                                <div style="display: flex;">
+                                    <div style="width: 60px; text-align: right; margin: 5px;">Name:</div>
+                                    <div style="width: 100%; margin: 5px;">Keyln The Great!</div>
+                                </div>
+                                <div style="display: flex;">
+                                    <div style="width: 60px; text-align: right; margin: 5px;">Health:</div>
+                                    <div style="width: 100%; margin: 5px;">1000</div>
+                                </div>
+                                <div style="display: flex;">
+                                    <div style="width: 60px; text-align: right; margin: 5px;">Strength:</div>
+                                    <div style="width: 100%; margin: 5px;">100</div>
+                                </div>
+                                <div style="display: flex;">
+                                    <div style="width: 60px; text-align: right; margin: 5px;">Agility:</div>
+                                    <div style="width: 100%; margin: 5px;">100</div>
+                                </div>
+                                <div style="display: flex;">
+                                    <div style="width: 60px; text-align: right; margin: 5px;">Speed:</div>
+                                    <div style="width: 100%; margin: 5px;">100</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="flex: 1 0 auto; padding: 5px;">
+            <div id="test" style="width: 98%; height:98%; margin: auto;">
+                <div id="map" style="width: 100%; height: 100%; background-color: green; margin: auto; border-radius: 3px; border: 3px solid gold; position: relative;">
+                <img id="hero" src="./pictures/TinyWarrior.png" style="width: 40px; height: 40px; position: absolute; top: 200px; left: 0px;" />
+                </div>
+            </div>
+        </div>  
+	</div>
+    <script type="text/javascript">startmap()</script>
+</body>
+</html>
