@@ -50,53 +50,101 @@
 	<title>Warrior Legends</title>
 </head>
 <body style="width: 98%; height: 98%; background-color: black; color: white; margin: 1%;">
-	<div style="height: 100%; width: 100%; background-color: gray; border-radius: 5px; display: flex; flex-direction: column;">
-        <div style="flex: 0 1 35%; padding: 5px;">
-            <div style="display: flex; flex-direction: column; width: 100%; height: 100%;">
-                <div style="flex: 1 1 50%;">
-                    <div style="text-align: center; font-size: 48px; color: gold;">Warrior Legends</div>
-                </div>
-                <div style="flex: 1 1 100%;">
-                    <div style="display: flex; position: relative;">
-                        <div style="width: 30%;">
-                            <img src="./pictures/warrior_profile.jpg" style="border: 3px solid gold; position: absolute; top: 0; left: 0; width: 30%;" />
+	<div style="height: 100%; width: 100%; background-color: gray; border-radius: 5px; padding: 1px">
+        <div style="display: flex; flex-flow: column; height: 100%; width: 100%; border-radius: 5px;">
+            <div style="flex: 0 1 43px; margin: 1px;">
+                <div style="text-align: center; font-size: 36px; color: orange;">Warrior Legends</div>
+            </div>
+            <div style="flex: 0 1 20%; max-height: 20%; margin: 1px; border: 1px solid gold; border-radius: 5px; padding: 5px; background-color: blue;">
+                <div style="display: flex; height: 100%; width: 100%;">
+                    <div style="flex: 1 1 20%; margin-right: 2px; border: 1px solid darkblue; border-radius: 5px; height: 100%;">
+                        <div style="display: flex; flex-flow: column; height: 100%;">
+                            <div style="flex: 0 1 24px; text-align: center;">
+                                <span style="font-size: 18px;">Keyln The Great!</span>
+                            </div>
+                            <div style ="flex: 1 1 auto;">
+                                <div style="width: 100%; height: 100%; position: relative;">
+                                    <img id="plyr_pic" src="./pictures/warrior_profile.jpg" style="display: block; margin: auto; height: 0;"/>
+                                </div>
+                            </div>
                         </div>
-                        <div style="position: absolute; top: 0; left: 30%; width: 70%;">
-                            <div style="display: flex; flex-direction: column; margin: 1px; border: 3px solid gold; border-radius: 5px; background-color: blue; padding: 5px;">
-                                <div style="display: flex;">
-                                    <div style="width: 60px; text-align: right; margin: 5px;">Name:</div>
-                                    <div style="width: 100%; margin: 5px;">Keyln The Great!</div>
+                    </div>
+                    <div style="display: flex; height: 100%; width: 100%;">
+                        <div style="flex: 1 1 20%; margin-right: 2px; border: 1px solid darkblue; border-radius: 5px; height: 100%;">
+                            <div style="display: flex; flex-flow: column; height: 100%;">
+                                <div style="flex: 0 1 24px; text-align: center;">
+                                    <span style="font-size: 18px;">Stats</span>
                                 </div>
-                                <div style="display: flex;">
-                                    <div style="width: 60px; text-align: right; margin: 5px;">Health:</div>
-                                    <div style="width: 100%; margin: 5px;">1000</div>
+                                <div style ="flex: 1 1 auto;">
+                                    <div style="max-height: 100%; overflow-y: auto;">
+                                        <div style="display: flex; flex-flow: column; width: 100%;">
+                                            <div style="width: 100%;">
+                                                <span style="text-align: right; margin: 5px;">Health:</span>10
+                                            </div>
+                                            <div style="display: flex;">
+                                                <div style="width: 60px; text-align: right; margin: 5px;">Strength:</div>
+                                                <div style="width: 100%; margin: 5px;">1</div>
+                                            </div>
+                                            <div style="display: flex;">
+                                                <div style="width: 60px; text-align: right; margin: 5px;">Agility:</div>
+                                                <div style="width: 100%; margin: 5px;">1</div>
+                                            </div>
+                                            <div style="display: flex;">
+                                                <div style="width: 60px; text-align: right; margin: 5px;">Speed:</div>
+                                                <div style="width: 100%; margin: 5px;">1</div>
+                                            </div>
+                                        </div>
+                                    </div> 
                                 </div>
-                                <div style="display: flex;">
-                                    <div style="width: 60px; text-align: right; margin: 5px;">Strength:</div>
-                                    <div style="width: 100%; margin: 5px;">100</div>
+                            </div>
+                        </div>                    
+                        <div id="top" style="flex: 1 1 20%; margin-right: 2px; border: 1px solid darkblue; border-radius: 5px; height: 100%;">
+                            <div style="display: flex; flex-flow: column; height: 100%;">
+                                <div style="flex: 0 1 24px; text-align: center;">
+                                    <span style="font-size: 18px;">Armor</span>
                                 </div>
-                                <div style="display: flex;">
-                                    <div style="width: 60px; text-align: right; margin: 5px;">Agility:</div>
-                                    <div style="width: 100%; margin: 5px;">100</div>
+                                <div style ="flex: 1 1 auto;">
                                 </div>
-                                <div style="display: flex;">
-                                    <div style="width: 60px; text-align: right; margin: 5px;">Speed:</div>
-                                    <div style="width: 100%; margin: 5px;">100</div>
+                            </div>
+                        </div>
+                        <div style="flex: 1 1 20%; margin-right: 2px; border: 1px solid darkblue; border-radius: 5px; height: 100%;">
+                            <div style="display: flex; flex-flow: column; height: 100%;">
+                                <div style="flex: 0 1 24px; text-align: center;">
+                                    <span style="font-size: 18px;">Inventory</span>
+                                </div>
+                                <div style ="flex: 1 1 auto;">
+                                </div>
+                            </div>
+                        </div>
+                        <div style="flex: 1 1 20%; margin-right: 2px; border: 1px solid darkblue; border-radius: 5px; height: 100%;">
+                            <div style="display: flex; flex-flow: column; height: 100%;">
+                                <div style="flex: 0 1 24px; text-align: center;">
+                                    <span style="font-size: 18px;">Skills</span>
+                                </div>
+                                <div style ="flex: 1 1 auto;">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div style="flex: 1 0 auto; padding: 5px;">
-            <div id="test" style="width: 98%; height:98%; margin: auto;">
-                <div id="map" style="width: 100%; height: 100%; background-color: green; margin: auto; border-radius: 3px; border: 3px solid gold; position: relative;">
-                <img id="hero" src="./pictures/TinyWarrior.png" style="width: 40px; height: 40px; position: absolute; top: 200px; left: 0px;" />
+            <div style="flex: 1 0 auto; margin: 1px; border: 1px solid gold; border-radius: 5px;">
+                <div id="test" style="width: 100%; height:100%; border-radius: 5px;">
+                    <div id="map" style="width: 100%; height: 100%; background-color: green; position: relative; border-radius: 5px;">
+                    <img id="hero" src="./pictures/TinyWarrior.png" style="width: 40px; height: 40px; position: absolute; top: 0; left: 0; border-radius: 5px;" />
+                    <img id="badarcher" src="./pictures/BadArcherIcon.png" style="width: 40px; height: 40px; position: absolute; top: 50%; left: 50%; border-radius: 5px;" />
+                    </div>
                 </div>
-            </div>
-        </div>  
-	</div>
-    <script type="text/javascript">startmap()</script>
+            </div>  
+    	</div>
+    </div>
+    <script type="text/javascript">
+    startmap()
+    function adjust_player_pic() {
+        document.getElementById("plyr_pic").style.height = (document.getElementById("top").getBoundingClientRect().height - 26) + "px";
+    }
+    window.addEventListener("resize", adjust_player_pic);
+    adjust_player_pic();
+    </script>
 </body>
 </html>
