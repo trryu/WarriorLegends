@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html style="height: 100%; width: 100%;">
+<head>
+    <style>
+        * {
+            overflow: hidden;
+            color: azure;
+            box-sizing: border-box;
+            font-size: 12px;
+        }
+        button {
+            color: black;
+        }
+        .odd {
+            background-color: #999999;
+        }
+        .even {
+            background-color: gray;
+        }
+         .arrow {
+             border: solid black;
+             border-width: 0 3px 3px 0;
+             display: inline-block;
+             padding: 3px;
+         }
+        .right {
+            transform: rotate(-45deg);
+            -webkit-transform: rotate(-45deg);
+        }
+        .left {
+            transform: rotate(135deg);
+            -webkit-transform: rotate(135deg);
+        }
+        .up {
+            transform: rotate(-135deg);
+            -webkit-transform: rotate(-135deg);
+        }
+        .down {
+            transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
+        }
+        .up_left {
+            transform: rotate(-180deg);
+            -webkit-transform: rotate(-180deg);
+        }
+
+        .up_right {
+            transform: rotate(-90deg);
+            -webkit-transform: rotate(-90deg);
+        }
+        .down_left {
+            transform: rotate(90deg);
+            -webkit-transform: rotate(90deg);
+        }
+        .down_right {
+            transform: rotate(0deg);
+            -webkit-transform: rotate(0deg);
+        }
+        .move_btn {
+            width: 27px;
+            display:inline-block;
+            color:#444;
+            border:1px solid #CCC;
+            background:#DDD;
+            box-shadow: 0 0 5px -1px rgba(0,0,0,0.2);
+            cursor:pointer;
+            vertical-align:middle;
+            max-width: 100px;
+            padding: 5px;
+            text-align: center;
+        }
+        .game_button {
+            width: auto;
+            margin: 4px;
+            display:inline-block;
+            color:#444;
+            border:1px solid #CCC;
+            background:#DDD;
+            cursor:pointer;
+            vertical-align:middle;
+            max-width: 100px;
+            padding: 5px;
+            text-align: center;
+        }
+        .progress {
+            margin-bottom: 5px;
+            padding: 2px;
+            width: 100%;
+            border: 1px solid #05e35e;
+            height: 20px;
+        }
+        .progress .progress__bar {
+            height: 100%;
+            width: 0;
+            background-color: #05e35e;
+            -webkit-transition:1000ms linear;
+            -moz-transition:1000ms linear;
+            -o-transition:1000ms linear;
+            -ms-transition:1000ms linear;
+            transition:1000ms linear;
+        }
+    </style>
+    <script type="text/javascript">
+        var game_status = "wait";
+        function adjust_info_heights() {
+            h = document.getElementsByTagName("html")[0].getBoundingClientRect().height * 0.17597292724196278;
+            document.getElementById("pic_height").style.height = h + "px";
+            document.getElementById("stats_height").style.height = h + "px";
+            document.getElementById("inv_height").style.height = h + "px";
+            document.getElementById("skills_height").style.height = h + "px";
+            document.getElementById("equip_height").style.height = h + "px";
+        }
+        window.addEventListener("resize", adjust_info_heights);
+        var map_inc = 0;
+        var map_container = null;
+        var map = null;
+        function startmap() {
+            map_container = document.getElementById("map_container");
+            map = document.getElementById("map");
+            if (map_container.getBoundingClientRect().width > map_container.getBoundingClientRect().height) map_side = map_container.getBoundingClientRect().height;
+            else map_side = map_container.getBoundingClientRect().width;
+            map.style.width = map_side + "px";
+            map.style.height = map_side + "px";
+            map_inc = map_side / 11;
+            reset_game();
+        }
+        function reset_game() {
+            create_hero();
+            create_mob();
+        }
+        var x = 0;
+        var y = 0;
+        var hero = null;
+        function create_hero() {
+            hero = document.getElementById("hero");
+            hero.setAttribute('src', "./pictures/TinyWarrior.png");
+            hero.style.width = map_inc + "px";
+            hero.style.height = map_inc + "px";
+            hero.style.borderRadius = "5px";
+            hero.style.position = "absolute";
+            hero.style.top = (map_inc * x) + "px";
+            hero.style.left = (map_inc * y) + "px";
+            document.getElementById("health_bar").style.width = "100%";
+        }
+        mob_x = 10;
+        mob_y = 10;
+        mob_status = "move";
+        //var mob_img = document.createElement("img");
+        //map.appendChild(mob_img);
+        var mob = null;
+        function create_mob() {
+            mob = document.getElementById("mob");
+            mob.setAttribute('src', "./pictures/BadArcherIcon.png");
+            mob.style.width = map_inc + "px";
+            mob.style.height = map_inc + "px";
+            mob.style.borderRadius = "5px";
+            mob.style.position = "absolute";
+            mob.style.top = (map_inc * mob_x) + "px";
+            mob.style.left = (map_inc * mob_y) + "px";
+            mob_controls();
+        }
+        var p_max_health = 100;
+        var p_health = 100;
+        var mob_worker;
+        function mob_controls() {
+            if (typeof (Worker) !== "undefined") {
+                if (typeof (mob_worker) == "undefined") {
+                    mob_worker = new Worker("mob_control.js");
+                    mob_worker.postMessage(["player_move",[x, y]]);
+                }
+                mob_worker.onmessage = function(event) {
+                    if (event.data[0] === "mob_fight") {
+                        game_status = event.data[1][0];
+                        console.log(game_status)
+                    } else if (event.data[0] === "mob_move") {
+                        mob_x = event.data[1][0];
+                        mob_y = event.data[1][1];
+                        mob.style.top = (map_inc * mob_y) + "px";
+                        mob.style.left = (map_inc * mob_x) + "px";
+                        mob_status = event.data[1][2];
+                        if (mob_status === "move") mob.style.border = "";
+                        else if (mob_status === "fight") mob.style.border = "1px solid red";
+                        else if (mob_status === "wait") mob.style.border = "1px dashed red";
+                    } else if (event.data[0] === "mob_msg") {
+
+                    }
+                };
+            } else {
+                console.log("Sorry! No Web Worker support.");
+            }
+        }
+        function pause_game() {
+            w.terminate();
+            w = undefined;
+        }
+        function game_start() {
+            console.log('starting')
+            game_status = "running";
+            mob_worker.postMessage(["game_status", [game_status]]);
+        }
+        function game_pause() {
+            game_status = "pause";
+            mob_worker.postMessage(["game_status", [game_status]]);
+        }
+        function game_reset() {
+            game_status = "reset";
+            mob_worker.postMessage(["game_status", [game_status]]);
+        }
+        function move_up() {
+            if (game_status === "running" && y > 0) {
+                y = y - 1;
+                hero.style.top = (y * map_inc) + "px";
+            }
+        }
+        function move_down() {
+            if (game_status === "running" && y < 10) {
+                y = y + 1;
+                hero.style.top = (y * map_inc) + "px";
+            }
+        }
+        function move_left() {
+            if (game_status === "running" && x > 0) {
+                x = x - 1;
+                hero.style.left = (x * map_inc) + "px";
+            }
+        }
+        function move_right() {
+            if (game_status === "running" && x < 10) {
+                x = x + 1;
+                hero.style.left = (x * map_inc) + "px";
+            }
+        }
+        document.addEventListener('keydown', (event) => {
+            switch(event.key) {
+                case 'ArrowUp':
+                    move_up();
+                    break;
+                case 'ArrowDown':
+                    move_down();
+                    break;
+                case 'ArrowLeft':
+                    move_left();
+                    break;
+                case 'ArrowRight':
+                    move_right();
+                    break;
+            }
+            mob_worker.postMessage(["player_move", [x, y]]);
+        });
+    </script>
+	<title>Warrior Legends</title>
+</head>
+<body style="width: 98%; height: 98%; background-color: gray; color: white; margin: 1%;">
+	<div style="height: 100%; width: 100%; background-color: gray; border-radius: 5px;">
+        <div style="display: flex; flex-flow: column; height: 100%; width: 100%; border-radius: 5px;">
+            <div style="flex: 0 1 43px; position: relative;">
+                <div style="text-align: center; font-size: 36px;">Warrior Legends</div>
+            </div>
+            <div style="flex: 0 1 20%; margin-bottom: 4px;">
+                <div style="display: flex; height: 100%; width: 100%;">
+                    <div style="flex: 1 1 20%; margin-right: 2px; border: 1px solid black; background-color: #102E4A; border-radius: 5px; height: 100%;">
+                        <div style="display: flex; flex-flow: column; height: 100%;">
+                            <div style="flex: 0 1 24px; text-align: center;">
+                                <span style="font-size: 18px;">Keyln The Great!</span>
+                            </div>
+                            <div style ="flex: 1 1 auto; margin: 0 4px 4px 4px;">
+                                <div style="width: 100%; height: 100%; position: relative; max-height: 100%; overflow-y: hidden;">
+                                    <img id="pic_height" src="./pictures/warrior_profile.jpg" style="display: block; margin: auto; height: 0;"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 1 1 20%; margin-right: 2px; border: 1px solid darkblue; border-radius: 5px; background-color: #102E4A; height: 100%;">
+                        <div style="display: flex; flex-flow: column; height: 100%;">
+                            <div style="flex: 0 0 22px; text-align: center;">
+                                <span style="font-size: 18px;">Stats</span>
+                            </div>
+                            <div style ="flex: 1 1 auto;  margin: 0 4px 4px 4px;">
+                                <div id="stats_height" style="height: 0; max-height: 100%; overflow-y: auto;">
+                                    <div class="odd" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">HP:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">100</div>
+                                        </div>
+                                    </div>
+                                    <div class="even" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">Armor:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">10</div>
+                                        </div>
+                                    </div>
+                                    <div class="odd" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">Strength:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">10</div>
+                                        </div>
+                                    </div>
+                                    <div class="even" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">Agility:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">10</div>
+                                        </div>
+                                    </div>
+                                    <div class="odd" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">Speed:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">10</div>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>                    
+                    <div style="flex: 1 1 20%; margin-right: 2px; border: 1px solid darkblue; border-radius: 5px; height: 100%; max-height: 100%; background-color: #102E4A;">
+                        <div style="display: flex; flex-flow: column; height: 100%;">
+                            <div style="flex: 0 0 22px; text-align: center;">
+                                <span style="font-size: 18px;">Equipment</span>
+                            </div>
+                            <div style ="flex: 1 1 auto;  margin: 0 4px 4px 4px;">
+                                <div id="equip_height" style="height: 0; max-height: 100%; overflow-y: auto;">
+                                    <div class="odd" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">Helm:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">none</div>
+                                        </div>
+                                    </div>
+                                    <div class="even" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">Chest:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">Shirt</div>
+                                        </div>
+                                    </div>
+                                    <div class="odd" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">Arms:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">none</div>
+                                        </div>
+                                    </div>
+                                    <div class="even" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">Legs:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">Pants</div>
+                                        </div>
+                                    </div>
+                                    <div class="odd" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 0 1 50px; text-align: right;">Feet:</div>
+                                            <div style="flex: 1 1 auto; text-align: right; margin-right: 20px;">Shoes</div>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 1 1 20%; margin-right: 2px; border: 1px solid darkblue; border-radius: 5px; height: 100%;  background-color: #102E4A;">
+                        <div style="display: flex; flex-flow: column; height: 100%;">
+                            <div style="flex: 0 0 22px; text-align: center;">
+                                <span style="font-size: 18px;">Inventory</span>
+                            </div>
+                            <div style ="flex: 1 1 auto;  margin: 0 4px 4px 4px;">
+                                <div id="inv_height" style="height: 0; max-height: 100%; overflow-y: auto;">
+                                    <div class="odd" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 1 1 auto; text-align: left;">Bread</div>
+                                            <div style="flex: 0 1 20px; text-align: right; margin-right: 20px;">3</div>
+                                        </div>
+                                    </div>
+                                    <div class="even" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 1 1 auto; text-align: left;">Water</div>
+                                            <div style="flex: 0 1 20px; text-align: right; margin-right: 20px;">5</div>
+                                        </div>
+                                    </div>
+                                    <div class="odd" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 1 1 auto; text-align: left;">Tent</div>
+                                            <div style="flex: 0 1 20px; text-align: right; margin-right: 20px;">1</div>
+                                        </div>
+                                    </div>
+                                    <div class="even" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 1 1 auto; text-align: left;">Candle</div>
+                                            <div style="flex: 0 1 20px; text-align: right; margin-right: 20px;">2</div>
+                                        </div>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 1 1 20%; border: 1px solid darkblue; border-radius: 5px; height: 100%; background-color: #102E4A;">
+                        <div style="display: flex; flex-flow: column; height: 100%;">
+                            <div style="flex: 0 0 22px; text-align: center;">
+                                <div style="font-size: 18px;">Skills</div>
+                            </div>
+                            <div style ="flex: 1 1 auto;  margin: 0 4px 4px 4px;">
+                                <div id="skills_height" style="height: 0; max-height: 100%; overflow-y: auto;">
+                                    <div class="odd" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 1 1 auto; text-align: left;">Punch</div>
+                                            <div style="flex: 0 1 12px; text-align: right; margin-right: 10px;">1</div>
+                                            <div style="flex: 0 1 20px; text-align: right; margin-right: 20px;">5</div>
+                                        </div>
+                                    </div>
+                                    <div class="even" style="display: flex; flex-flow: column; width: 100%;">
+                                        <div style="width: 100%; display: flex; margin: 2px 5px;">
+                                            <div style="flex: 1 1 auto; text-align: left;">Kick</div>
+                                            <div style="flex: 0 1 12px; text-align: right; margin-right: 10px;">2</div>
+                                            <div style="flex: 0 1 20px; text-align: right; margin-right: 20px;">12</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="bottom_container" style="flex: 1 0 auto; width: 100%; margin: 1px;">
+                <div style="display: flex; flex-flow: row; height: 100%; max-height: 100%;">
+                    <div style="flex: 0 1 100px; margin-right: 5px; height: 100%; max-height: 100%;">
+                        <div id="game_controls_container" style="display: flex; flex-flow: column; width: 100%; margin-bottom: 5px;">
+                            <div id="game_controls" style="flex: 0 1 auto; width: 100px; min-height: 74px; max-height: 150px; border: 1px solid darkblue; border-radius: 5px; background-color: #102E4A;">
+                                <div id="game_control_buttons" style="display: flex; flex-flow: column; width: 100%">
+                                    <div id="game_start" class="game_button" onclick="game_start()">Start</div>
+                                    <div id="game_pause" class="game_button" onclick="game_pause()">Pause</div>
+                                    <div id="game_reset" class="game_button" onclick="game_reset()">Reset</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="action_container" style="display: flex; flex-flow: column; width: 100%; margin-bottom: 5px;">
+                            <div id="movement_container" style="flex: 0 1 auto; max-width: 100px; max-height: 100px; border: 1px solid darkblue; border-radius: 5px; background-color: #102E4A;">
+                                <div id="movements" style="padding: 5px;">
+                                    <div id="movement_buttons" style="display: flex; flex-flow: column; height: 100%; justify-content: space-between;">
+                                        <div style="width: 100%;">
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <div class="move_btn" onclick="move_up(); move_left();"><div class="arrow up_left"></div></div>
+                                                <div class="move_btn" onclick="move_up()"><div class="arrow up"></div></div>
+                                                <div class="move_btn" onclick="move_up(); move_right()"><div class="arrow up_right"></div></div>
+                                            </div>
+                                        </div>
+                                        <div style="width: 100%;">
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <div class="move_btn" onclick="move_left()"><div class="arrow left"></div></div>
+                                                <div class="move_btn" onclick="move_right()"><div class="arrow right"></div></div>
+                                            </div>
+                                        </div>
+                                        <div style="width: 100%;">
+                                            <div style="display: flex; justify-content: space-between;">
+                                                <div class="move_btn" onclick="move_down(); move_left();"><div class="arrow down_left"></div></div>
+                                                <div class="move_btn" onclick="move_down();"><div class="arrow down"></div></div>
+                                                <div class="move_btn" onclick="move_down(); move_right();"><div class="arrow down_right"></div></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="active_stats_container" style="display: flex; flex-flow: column; width: 100%; margin-bottom: 5px;">
+                            <div id="active_stats" style="flex: 0 1 auto; width: 100px; min-height: 74px; max-height: 150px; border: 1px solid darkblue; border-radius: 5px; background-color: #102E4A; padding: 5px;">
+                                <div id="active_stats_chart" style="display: flex; flex-flow: column; width: 100%;">
+                                    <div style="width: 100%; text-align: center;">Health</div>
+                                    <div class="progress">
+                                        <div id="health_bar" class="progress__bar"></div>
+                                    </div>
+                                    <div style="width: 100%; text-align: center;">Skills</div>
+                                    <div id="skill1" class="game_button" onclick="player_fight()">Hit</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="console_container" style="display: flex; flex-flow: column; width: 100%; margin-bottom: 5px;">
+                            <div id="console" style="flex: 0 1 auto; width: 100px; min-height: 74px; max-height: 150px; border: 1px solid darkblue; border-radius: 5px; background-color: #102E4A;">
+                                <div id="console_rows" style="display: flex; flex-flow: column; width: 100%; padding: 5px;">
+                                    <div style="width: 100%;">Start</div>
+                                    <div style="width: 100%;">Pause</div>
+                                    <div style="width: 100%;">Reset</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="map_container" style="flex: 1 0 auto; width: auto; height: 100%; margin: 1px;">
+                        <div id="map" style="width: 100%; height:100%; border: 1px solid gold; border-radius: 5px; background-color: green; position: relative;">
+                            <img id="hero" />
+                            <img id="mob" />
+                        </div>
+                    </div>
+                </div>
+            </div>  
+    	</div>
+    </div>
+    <script type="text/javascript">
+    adjust_info_heights();
+    startmap();
+    </script>
+</body>
+</html>
